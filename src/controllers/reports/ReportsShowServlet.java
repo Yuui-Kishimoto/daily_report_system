@@ -35,9 +35,15 @@ public class ReportsShowServlet extends HttpServlet {
 
         Report r = em.find(Report.class, Integer.parseInt(request.getParameter("id")));
 
+        long likes_count = (long)em.createNamedQuery("getLikesCount", Long.class)
+                .setParameter("login_employee", request.getSession().getAttribute("login_employee"))
+                .setParameter("report", r)
+                .getSingleResult();
+
         em.close();
 
         request.setAttribute("report", r);
+        request.setAttribute("likes_count", likes_count);
         request.setAttribute("_token", request.getSession().getId());
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/show.jsp");
