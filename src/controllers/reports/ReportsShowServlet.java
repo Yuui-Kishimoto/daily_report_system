@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import models.Employee;
 import models.Report;
 import utils.DBUtil;
 
@@ -36,14 +37,25 @@ public class ReportsShowServlet extends HttpServlet {
         Report r = em.find(Report.class, Integer.parseInt(request.getParameter("id")));
 
         long likes_count = (long)em.createNamedQuery("getLikesCount", Long.class)
-                .setParameter("login_employee", request.getSession().getAttribute("login_employee"))
+                .setParameter("login_employee", (Employee)request.getSession().getAttribute("login_employee"))
                 .setParameter("report", r)
                 .getSingleResult();
 
+
+
+        long follows_count = (long)em.createNamedQuery("getFollowsCount", Long.class)
+                .setParameter("login_employee", (Employee)request.getSession().getAttribute("login_employee"))
+                .setParameter("follow", r.getEmployee())
+                .getSingleResult();
+
+
+
         em.close();
 
+        request.setAttribute("follow", r.getEmployee());
         request.setAttribute("report", r);
         request.setAttribute("likes_count", likes_count);
+        request.setAttribute("follows_count", follows_count);
         request.setAttribute("_token", request.getSession().getId());
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/show.jsp");
